@@ -1,4 +1,7 @@
-const memberList = require("../data/members");
+const member = require("../data/members.js");
+const path = require('path');
+// const fs = require('fs')
+// const membersList = member.membersList;
 
 // ===============================================================================
 // ROUTING
@@ -12,7 +15,7 @@ module.exports = function(app) {
   // ---------------------------------------------------------------------------
 
   app.get("/api/members", function(req, res) {
-    res.json(memberList);
+    res.json(member);
   });
 
   // API POST Requests
@@ -23,28 +26,72 @@ module.exports = function(app) {
   // Then the server saves the data to the tableData array)
   // ---------------------------------------------------------------------------
 
-//   app.post("/api/members", function(req, res) {
-//     // Note the code here. Our "server" will respond to requests and let users know if they have a table or not.
-//     // It will do this by sending out the value "true" have a table
-//     // req.body is available since we're using the body-parser middleware
-//     // if (tableData.length < 5) {
-//     //   tableData.push(req.body);
-//     //   res.json(true);
-//     // }
-//     // else {
-//     //   waitListData.push(req.body);
-//     //   res.json(false);
-//     // }
-//   });
+  app.post("/api/members", function(req, res) {
+    console.log('this is req body', req.body);
+    // console.log('this is res' , res);
 
-  // ---------------------------------------------------------------------------
-  // I added this below code so you could clear out the table while working with the functionality.
-  // Don"t worry about it!
+    var greatMatch = {
+        name: "",
+        image: "",
+        matchDifference: 0
+    };
+
+    var usrData 	= req.body;
+    var usrName 	= usrData.name;
+    var usrImage 	= usrData.image;
+    var usrScores 	= usrData.scores;
+    var totalDifference = 0;
+
+    //loop through the member data array of objects to get each friends scores
+
+    for(i = 0; i < member.length-1; i++){
+
+        console.log(member[i].name);
+        totalDifference = 0;
+        //loop through that friends score and the users score and calculate the 
+        // absolute difference between the two and push that to the total difference variable set above
+
+        for(var j = 0; j < 10; j++) {
+            // We calculate the difference between the scores and sum them into the totalDifference
+            totalDifference += Math.abs(parseInt(usrScores[j]) - parseInt(member[i].scores[j]));
+            // If the sum of differences is less then the differences of the current "best match"
+
+            if (totalDifference <= greatMatch.matchDifference) {
+
+                // Reset the bestMatch to be the new friend. 
+
+                greatMatch.name = member[i].name;
+                greatMatch.image = member[i].photoUrl;
+                greatMatch.matchDifference = totalDifference;
+            }
+        }
+    }
+       
+    member.push(usrData);
+    console.log('push in survery data');
+    console.log('member object here:', member);
+    console.log('-----------------------------');
+
+    res.json(greatMatch);
+    console.log('The great match info:', greatMatch);
+    console.log('The great match info:', greatMatch.name);
+
+    // let filePath = __dirname + 'app/data/members.js';
+    // request.on('end', function (){
+    //     fs.appendFile(filePath, body, function() {
+    //         respond.end();
+    //     });
+    // });
+
+        
+  });
+
+    
 
   app.post("/api/clear", function() {
     // Empty out the arrays of data
-    memberList = [];
+    member = [];
 
-    console.log("The member list is deleted.", memberList);
+    console.log("The member list is deleted.", json(member));
   });
 };

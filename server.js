@@ -25,3 +25,8 @@ require("./app/routing/htmlRoutes")(app);
 app.listen(PORT, function() {
     console.log("App listening on PORT: " + PORT);
 });
+
+process.on( 'SIGINT', function() {
+    console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+    process.exit();
+})
